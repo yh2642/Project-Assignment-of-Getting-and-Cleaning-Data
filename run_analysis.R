@@ -1,6 +1,6 @@
 old.dir <- getwd()
 
-setwd("./UCI HAR Dataset")
+setwd("./UCI HAR Dataset")                       ## read all data in directory
 feature_label <- read.table("features.txt")
 activity_label <- read.table("activity_labels.txt")
 data_test <- read.table("./test/X_test.txt")
@@ -43,12 +43,12 @@ merge_subject <- rbind(subject_test, subject_train)
 var.labels <- feature_label[,"V2"]
 var.labels <- as.character(var.labels)     # transfer the labels from factor to character 
 names(var.labels) <- names(merge_data)         # rename the var.labels according x_test
-library(Hmisc)
+library(Hmisc)                              # label the variable use function label in the package "Hmisc"
 label(merge_data) <- lapply(names(var.labels), function(x) label(merge_data[,x]) <- var.labels[x])
 
 
 merge_data_all <- cbind(merge_activity, merge_subject, merge_data)
-
+   ## calucate the mean and sd of each measurement, then assign it into the table
 merge_data_all$body_acc_x_mean <- apply(rbind(body_acc_x_test, body_acc_x_train), 1, mean)
 merge_data_all$body_acc_x_sd <- apply(rbind(body_acc_x_test, body_acc_x_train), 1, sd)
 merge_data_all$body_acc_y_mean <- apply(rbind(body_acc_y_test, body_acc_y_train), 1, mean)
@@ -68,6 +68,7 @@ merge_data_all$total_acc_y_sd <- apply(rbind(total_acc_y_test, total_acc_y_train
 merge_data_all$total_acc_z_mean <- apply(rbind(total_acc_z_test, total_acc_z_train), 1, mean)
 merge_data_all$total_acc_z_sd <- apply(rbind(total_acc_z_test, total_acc_z_train), 1, sd)
 
+##  Extracts only the measurements on the mean and standard deviation for each measurement. 
 merge_data_all$subject  <- factor(merge_data_all$subject)
 merge_data_all$activity <- factor(merge_activity$activity)
 levels(merge_data_all$activity) <- activity_label$V2
@@ -78,6 +79,7 @@ Activity_mean <- sapply(spIns, colMeans)
 spIns_subject <- split(merge_data_all[,3:581], merge_data_all$subject)
 Subject_mean <- sapply(spIns_subject, colMeans)
 
+## output the tidy data frame 
 output_tidy_data <- merge(Activity_mean, Subject_mean, by = "row.names", sort = FALSE)
 colnames(output_tidy_data)[1] <- "Variables"
 
